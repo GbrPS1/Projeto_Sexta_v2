@@ -1,0 +1,81 @@
+<html>
+	<head>
+		<title>Aula06</title>
+		<style>
+			body { margin: 0; }
+			canvas { width: 100%; height: 100% }
+		</style>
+	</head>
+	<body>
+		<script src="js/three.js"></script>
+		<script src="js/controls/OrbitControls.js"></script>
+		<script>
+			var scene = new THREE.Scene();
+			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
+
+			var renderer = new THREE.WebGLRenderer();
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
+
+			var controls = new THREE.OrbitControls( camera, renderer.domElement );
+			//--------
+
+			const gridHelper = new THREE.GridHelper(50,50);
+			scene.add(gridHelper);
+
+			// const axesHelper = new THREE.AxesHelper(5); // Cria um guia para os eixos cartesianos
+			// scene.add(axesHelper); 						// Adiciona os eixos na cena
+			
+			var loader = new THREE.TextureLoader();
+			var texture = loader.load("img/earth.jpg");
+			var spacebg = loader.load("img/space.jpg");
+			var normalMap = loader.load("img/normal.jpg");
+			var specMap = loader.load("img/specular.jpg");
+			var sol = loader.load("img/sol.jpg");
+
+
+			const geometry = new THREE.SphereGeometry( 8, 64, 32 );
+			
+
+			const light = new THREE.AmbientLight(0xffffff, 0.8 );
+			const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+			directionalLight.position.x = -10;
+			directionalLight.position.y = 0;
+			directionalLight.position.z = 10;
+			
+			scene.background = spacebg;
+			
+
+			var solMaterial = new THREE.MeshPhongMaterial({
+				//map: texture,
+				map: sol,
+				normalMap,
+				specMap,
+				specular: '0x333333',
+				shininess: '15'
+				
+				});
+
+			const sphere = new THREE.Mesh( geometry, solMaterial );
+			
+
+			scene.add(sphere,light, directionalLight );			
+			
+			//camera.position.x = 4;
+			camera.position.y = 4;
+			camera.position.z = 4;
+
+			//---------
+			var animate = function () {
+				requestAnimationFrame( animate );
+
+				sphere.rotation.y += 0.01;
+
+				controls.update();
+
+				renderer.render( scene, camera );
+			};
+			animate();
+		</script>
+	</body>
+</html>

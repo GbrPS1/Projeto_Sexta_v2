@@ -1,0 +1,98 @@
+<html>
+
+<head>
+	<title>James</title>
+	<style>
+		body {
+			margin: 0;
+		}
+
+		canvas {
+			width: 100%;
+			height: 100%
+		}
+	</style>
+</head>
+
+<body>
+	<script src="js/three.js"></script>
+	<script src="js/controls/OrbitControls.js"></script>
+	<script src="js/loaders/GLTFLoader.js"></script>
+	<script>
+		var scene = new THREE.Scene();
+		var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+		var renderer = new THREE.WebGLRenderer();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
+
+		var controls = new THREE.OrbitControls( camera, renderer.domElement );
+		//--------
+
+		const gridHelper = new THREE.GridHelper(10, 10);
+		scene.add(gridHelper);
+
+		const axesHelper = new THREE.AxesHelper(5); // Cria um guia para os eixos cartesianos
+		scene.add(axesHelper); 						// Adiciona os eixos na cena
+
+		//Iluminação		
+		const directLight = new THREE.DirectionalLight(0xffffff, 1);
+		directLight.position.set(-10, 0, 10);
+		directLight.target.position.set(0, 0, 0);
+		const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+		scene.add(ambientLight, directLight);
+		scene.add(directLight.target);
+
+		
+
+		const gltfLoader = new THREE.GLTFLoader();
+		const img = 'assets/James_Webb/scene.gltf';
+		gltfLoader.load(img, (gltf) => {
+			gltf.scene.scale.set(0.1, 0.1, 0.1);
+            
+			const root = gltf.scene;
+        
+			
+			var animate = function () {
+			requestAnimationFrame(animate);					
+			controls.update();
+			renderer.render(scene, camera);
+		};
+		animate();
+			
+			console.log(dumpObject(root).join('\n'));
+			scene.add(root);
+});
+
+
+
+		//camera.position.x = 4;
+		camera.position.y = 3;
+		camera.position.z = 3;	
+
+		function dumpObject(obj, lines = [], isLast = true, prefix = '') {
+			const localPrefix = isLast ? '└─' : '├─';
+			lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || 'Sketchfab_Scene'} [${obj.type}]`);
+			const newPrefix = prefix + (isLast ? ' ' : '│ ');
+			const lastNdx = obj.children.length - 1;
+			obj.children.forEach((child, ndx) => {
+			const isLast = ndx === lastNdx;
+			dumpObject(child, lines, isLast, newPrefix);
+		});
+	return lines;
+
+	
+}; 
+
+
+		var animate = function () {
+			requestAnimationFrame(animate);					
+			controls.update();
+			
+			renderer.render(scene, camera);
+		};
+		animate();
+	</script>
+</body>
+
+</html>

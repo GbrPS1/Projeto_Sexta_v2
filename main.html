@@ -1,0 +1,402 @@
+<html>
+
+<head>
+	<title>Sistema Solar</title>
+	<style>
+		body {
+			margin: 0;
+		}
+
+		canvas {
+			width: 100%;
+			height: 100%
+		}
+	</style>
+
+	<script src='/js/three.js'></script>
+	<script src='/js/controls/OrbitControls.js'></script>
+	<script src='/js/loaders/GLTFLoader.js'></script>
+</head>
+
+<body>
+	<!-- <script src="js/three.js"></script>
+	<script src="js/controls/OrbitControls.js"></script> -->
+
+	<script defer>
+		var scene = new THREE.Scene();
+		var camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.5, 1000);
+
+		var renderer = new THREE.WebGLRenderer();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		document.body.appendChild(renderer.domElement);
+
+		var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+		//--------
+
+		//const gridHelper = new THREE.GridHelper(50,50);
+		//scene.add(gridHelper);
+
+		// const axesHelper = new THREE.AxesHelper(5); // Cria um guia para os eixos cartesianos
+		// scene.add(axesHelper); 						// Adiciona os eixos na cena
+
+		var loader = new THREE.TextureLoader();
+		var textTerra = loader.load("img/earth.jpg");
+		var spacebg = loader.load("img/space.jpg");
+		var normalMap = loader.load("img/normal.jpg");
+		var specMap = loader.load("img/specular.jpg");
+		var imgsol = loader.load("img/sol.jpg");
+		var mercText = loader.load("img/mercurio.jpg");
+		var luaText = loader.load("img/mercurio.jpg");
+		var venText = loader.load("img/venus.jpg");
+		var marText = loader.load("img/marte.jpg");
+		var jupText = loader.load("img/jupiter.jpg");
+		var satText = loader.load("img/saturno.jpg");
+		var uraText = loader.load("img/urano.jpg");
+		var netText = loader.load("img/netuno.jpg");
+
+
+		const cubeLoader = new THREE.CubeTextureLoader();
+		const texture = cubeLoader.load([
+			'./img/ulukai/corona_ft.png',
+			'./img/ulukai/corona_bk.png',
+			'./img/ulukai/corona_up.png',
+			'./img/ulukai/corona_dn.png',
+			'./img/ulukai/corona_rt.png',
+			'./img/ulukai/corona_lf.png',
+		]);
+
+
+		const materialRing = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, opacity: 0.18, transparent: true });
+
+		const ringsgeometryList = [
+			new THREE.RingGeometry(25, 25.1, 100),
+			new THREE.RingGeometry(40, 40.1, 100),
+			new THREE.RingGeometry(55, 55.1, 100),
+			new THREE.RingGeometry(65, 65.1, 100),
+			new THREE.RingGeometry(80, 80.1, 100),
+			new THREE.RingGeometry(95, 95.1, 100),
+			new THREE.RingGeometry(105, 105.1, 100),
+			new THREE.RingGeometry(117, 117.1, 100),
+		]
+
+		const meshList = ringsgeometryList.map(ring => {
+			const meshPlanet = new THREE.Mesh(ring, materialRing);
+			meshPlanet.rotation.set(1.6, 0, 0);
+			return meshPlanet;
+		});
+
+		scene.add(...meshList);
+
+		//GLTF
+		
+		
+		
+		
+		const gltfLoader = new THREE.GLTFLoader();
+		
+		
+		const img = 'assets/OVNI/scene.gltf';
+		gltfLoader.load(img, (gltf) => {
+			gltf.scene.scale.set(1, 1, 1);
+            
+			const disco = gltf.scene;
+            disco.position.setX(65);
+            disco.position.setY(3);
+            disco.position.setZ(5);
+
+			const mzOVNI = new THREE.Matrix4();
+			mzOVNI.makeRotationY(0.008);
+
+
+			var animate = function () {
+			requestAnimationFrame(animate);					
+			controls.update();
+			renderer.render(scene, camera);
+			disco.applyMatrix4(mzOVNI);
+			disco.rotation.x += 0.01;
+			
+		};
+		animate();
+			console.log(dumpObject(disco).join('\n'));
+			
+			scene.add(disco);
+});
+
+
+		const img2 = 'assets/James_Webb/scene.gltf';
+		gltfLoader.load(img2, (gltf) => {
+			gltf.scene.scale.set(0.08, 0.08, 0.08);
+            
+			const james = gltf.scene;
+            james.position.setX(58);
+            const mzJames = new THREE.Matrix4();
+			mzJames.makeRotationY(0.008);
+
+			var animate = function () {
+			requestAnimationFrame(animate);					
+			controls.update();
+			james.applyMatrix4(mzJames);
+			
+			renderer.render(scene, camera);
+		};
+		animate();
+			
+			
+			console.log(dumpObject(james).join('\n'));
+			
+			scene.add(james);
+});
+
+function dumpObject(obj, lines = [], isLast = true, prefix = '') {
+			const localPrefix = isLast ? '└─' : '├─';
+			lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || 'Sketchfab_Scene'} [${obj.type}]`);
+			const newPrefix = prefix + (isLast ? ' ' : '│ ');
+			const lastNdx = obj.children.length - 1;
+			obj.children.forEach((child, ndx) => {
+			const isLast = ndx === lastNdx;
+			dumpObject(child, lines, isLast, newPrefix);
+		});
+	return lines;
+
+	
+}; 
+
+
+
+
+
+
+
+
+
+
+
+
+
+		//camera.position.x = 4;
+		camera.position.y = 3;
+		camera.position.z = 3;	
+
+		function dumpObject(obj, lines = [], isLast = true, prefix = '') {
+			const localPrefix = isLast ? '└─' : '├─';
+			lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || 'Sketchfab_Scene'} [${obj.type}]`);
+			const newPrefix = prefix + (isLast ? ' ' : '│ ');
+			const lastNdx = obj.children.length - 1;
+			obj.children.forEach((child, ndx) => {
+			const isLast = ndx === lastNdx;
+			dumpObject(child, lines, isLast, newPrefix);
+		});
+	return lines;
+
+	
+}; 
+
+
+
+
+
+		const geometry = new THREE.SphereGeometry(10, 64, 32);
+
+		const tamMercurio = new THREE.SphereGeometry(0.7, 64, 32);
+		const tamVenus = new THREE.SphereGeometry(1, 64, 32);
+		const tamTerra = new THREE.SphereGeometry(1.3, 64, 32);
+		const tamLua = new THREE.SphereGeometry(0.3, 64, 32);
+		const tamMarte = new THREE.SphereGeometry(0.7, 64, 32);
+		const tamJupiter = new THREE.SphereGeometry(5, 64, 32);
+		const tamSaturno = new THREE.SphereGeometry(1, 64, 32);
+		const tamUrano = new THREE.SphereGeometry(1, 64, 32);
+		const tamNetuno = new THREE.SphereGeometry(0.5, 64, 32);
+		const anel = new THREE.TorusGeometry(3, 0.5, 2, 200);
+		const tamMeteoro = new THREE.TetrahedronGeometry(1, 2);
+		anel.rotateX(-90 * Math.PI / 180);
+
+		const light = new THREE.AmbientLight(0xffffff, 0.8);
+		// const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+		// directionalLight.position.x = -10;
+		// directionalLight.position.y = 0;
+		// directionalLight.position.z = 10;
+
+		scene.background = texture;
+
+
+		var solMaterial = new THREE.MeshPhongMaterial({
+
+			map: imgsol,
+			emissiveIntensity: 10000,
+			transparent: true,
+			opacity: 1
+
+		});
+
+		var mercurioMaterial = new THREE.MeshPhongMaterial({
+
+			map: mercText
+
+		});
+
+		var venusMaterial = new THREE.MeshPhongMaterial({
+
+			map: venText
+
+		});
+
+		var terraMaterial = new THREE.MeshPhongMaterial({
+
+			map: textTerra,
+			specMap,
+
+		});
+		var luaMaterial = new THREE.MeshPhongMaterial({
+
+			map: mercText
+
+		});
+		var MarteMaterial = new THREE.MeshPhongMaterial({
+
+			map: marText
+
+		});
+		var jupiterMaterial = new THREE.MeshPhongMaterial({
+
+			map: jupText
+
+		});
+		var saturnoMaterial = new THREE.MeshPhongMaterial({
+
+			map: satText
+
+		});
+		var uranoMaterial = new THREE.MeshPhongMaterial({
+
+			map: uraText
+
+		});
+		var netunoMaterial = new THREE.MeshPhongMaterial({
+
+			map: netText
+
+		});
+
+
+		const sol = new THREE.Mesh(geometry, solMaterial);
+		const mercurio = new THREE.Mesh(tamMercurio, mercurioMaterial);
+		const venus = new THREE.Mesh(tamVenus, venusMaterial);
+		const terra = new THREE.Mesh(tamTerra, terraMaterial);
+		const lua = new THREE.Mesh(tamLua, luaMaterial);
+		const marte = new THREE.Mesh(tamMarte, MarteMaterial);
+		const jupiter = new THREE.Mesh(tamJupiter, jupiterMaterial);
+		const saturno = new THREE.Mesh(tamSaturno, saturnoMaterial);
+		const anelSaturno = new THREE.Mesh(anel, saturnoMaterial);
+		const urano = new THREE.Mesh(tamUrano, uranoMaterial);
+		const netuno = new THREE.Mesh(tamNetuno, netunoMaterial);
+		const meteoro = new THREE.Mesh(tamMeteoro, mercurioMaterial);
+
+
+		const color = 0xFFFFFF;
+		const intensity = 0.05;
+		const pointLight = new THREE.PointLight(color, intensity);
+		pointLight.power = 20;
+		pointLight.decay = 2;
+		pointLight.distance = Infinity;
+		pointLight.position.set(0, 0, 0);
+		scene.add(pointLight);
+
+
+		//posições inicial dos planetas
+
+		mercurio.position.set(25, 0.5, 0)
+		venus.position.x = 40;
+		terra.position.x = 55;
+		lua.position.x = 50;
+		lua.position.y = 0;
+		lua.position.z = 0;
+		marte.position.x = 65;
+		jupiter.position.x = 80;
+		saturno.position.x = 95;
+		anelSaturno.position.x = 95;
+		urano.position.x = 105;
+		netuno.position.x = 115.5;
+		netuno.position.y = 0;
+		meteoro.position.x = 125;
+
+
+		const mzMercurio = new THREE.Matrix4();
+		mzMercurio.makeRotationY(0.02);
+
+		const mzVenus = new THREE.Matrix4();
+		mzVenus.makeRotationY(0.01);
+
+		const mzTerra = new THREE.Matrix4();
+		mzTerra.makeRotationY(0.005);
+		const mzRotação = new THREE.Matrix4();
+		mzTerra.makeRotationY(0.008);
+
+		const mzLua = new THREE.Matrix4();
+		mzLua.makeRotationY(0.008);
+
+		const mzMarte = new THREE.Matrix4();
+		mzMarte.makeRotationY(0.007);
+
+		const mzJupiter = new THREE.Matrix4();
+		mzJupiter.makeRotationY(0.006);
+
+		const mzSaturno = new THREE.Matrix4();
+		mzSaturno.makeRotationY(0.005);
+
+		const mzAnel = new THREE.Matrix4();
+		mzAnel.makeRotationY(0.005);
+
+		const mzUrano = new THREE.Matrix4();
+		mzUrano.makeRotationY(0.003);
+
+		const mzNetuno = new THREE.Matrix4();
+		mzNetuno.makeRotationY(0.002);
+
+		const mzMeteoro = new THREE.Matrix4();
+		mzMeteoro.makeRotationY(0.001);
+	
+		scene.add(sol, light, mercurio, venus, terra, marte, jupiter, saturno, urano, netuno, anelSaturno, lua, meteoro);
+
+		camera.position.set(-50, 50, -60);
+		
+
+		//---------
+		var animate = function () {
+			requestAnimationFrame(animate);
+
+			sol.rotation.y += 0.002;
+			mercurio.applyMatrix4(mzMercurio);
+			venus.applyMatrix4(mzVenus);
+			terra.applyMatrix4(mzTerra);
+
+			
+			
+			// var time = Date.now() * 0.0005;
+			
+			// lua.position.x = 54 + Math.cos	(time + 0.5) * 4;
+			// lua.position.y = Math.cos(time + 0.5) * 0;
+			// lua.position.z = Math.sin(time + 0.5) * 5;
+			
+			lua.applyMatrix4(mzLua);
+			marte.applyMatrix4(mzMarte);
+			jupiter.applyMatrix4(mzJupiter);
+			saturno.applyMatrix4(mzSaturno);
+			anelSaturno.applyMatrix4(mzAnel);
+			urano.applyMatrix4(mzUrano);
+			netuno.applyMatrix4(mzNetuno);
+			meteoro.applyMatrix4(mzMeteoro);
+
+			
+			camera.position.x -= Math.PI / 400;
+			camera.position.z -= Math.PI / 400;
+
+			controls.update();
+
+			renderer.render(scene, camera);
+		};
+		animate();
+	</script>
+</body>
+
+</html>
